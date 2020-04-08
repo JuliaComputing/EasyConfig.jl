@@ -34,6 +34,7 @@ function json(o::Object)
 end
 
 json(x) = x
+json(x::AbstractVector) = collect(x)
 json(x::Union{AbstractString, Char}) = "\"$x\""
 json(::Nothing) = "null"
 
