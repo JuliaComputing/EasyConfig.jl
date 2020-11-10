@@ -1,78 +1,100 @@
 module EasyConfig
 
 using OrderedCollections
-using AbstractTrees
 
-export config
-config(args...) = Object(args...)
+export Config, indent!
 
-struct Object 
-    name::Symbol
-    dict::OrderedDict{Symbol, Any}
-end
-Object(kv::Pair...) = Object(:origin, kv...)
-Object(name::Symbol, kv::Pair...) = Object(name, OrderedDict{Symbol, Any}(kv...))
-_d(o::Object) = getfield(o, :dict)
-
-Base.getproperty(o::Object, k::Symbol) = get!(_d(o), k, Object(k))
-Base.setproperty!(o::Object, k::Symbol, v) = _d(o)[k] = v
-Base.propertynames(o::Object) = collect(values(_d(o)))
-
-#-----------------------------------------------------------------------------# json 
-function json(o::Object)
-    d = _d(o)
-    if isempty(d)
-        return "null"
-    else
-        s = "{"
-        for (i, (k,v)) in enumerate(d)
-            s *= "\"$k\":$(json(v))"
-            i != length(d) && (s *= ',')
-        end
-        s *= "}"
-    end
+function __init__()
+    spaces[] = 4
 end
 
-json(x) = x
-json(x::AbstractVector) = collect(x)
-json(x::Union{AbstractString, Char}) = "\"$x\""
-json(::Nothing) = "null"
+spaces = Ref{Int}()
+indent!(i::Int) = (spaces[] = i)
+
+#-----------------------------------------------------------------------------# Config
+mutable struct Config 
+    d::OrderedDict{Symbol, Any}
+end
+Config(;kw...) = Config(OrderedDict{Symbol, Any}(kw))
+
+dict(o::Config) = getfield(o, :d)
 
 
+Base.getproperty(o::Config, k::Symbol) = get!(dict(o), k, Config())
+Base.setproperty!(o::Config, k::Symbol, v) = dict(o)[k] = v
+Base.propertynames(o::Config) = collect(values(dict(o)))
+
+Base.iterate(o::Config, args...) = iterate(dict(o), args...)
+Base.keys(o::Config) = keys(dict(o))
+Base.values(o::Config) = values(dict(o))
+Base.length(o::Config) = length(dict(o))
+Base.isempty(o::Config) = isempty(dict(o))
+Base.pairs(o::Config) = pairs(dict(o))
+Base.empty!(o::Config) = empty!(dict(o))
+
+OrderedDict(x::Config) = OrderedDict(k => v isa Config ? OrderedDict(v) : v for (k,v) in pairs(x))
 
 #-----------------------------------------------------------------------------# show
-Base.show(io::IO, o::Object) = AbstractTrees.print_tree(io, o, 100)
-function AbstractTrees.children(o::Object)
-    d = _d(o)
-    if isempty(d)
-        () 
-    else 
-        out = []
-        for (k, v) in d
-            v isa Object ? push!(out, v) : push!(out, NameAndValue(k, v))
+function Base.show(io::IO, o::Config; indent=0) 
+    colors = [:light_cyan, :light_green, :light_yellow, :light_red, :light_blue, :light_magenta]
+    labelcolor = colors[(indent % length(colors)) + 1]
+    for (i, (k,v)) in enumerate(pairs(o))
+        print(io, (' ' ^ spaces[]) ^ indent)
+        if v isa Config
+            if length(v) > 0 
+                printstyled(io, "$k: ", color=labelcolor)
+                println(io)
+                show(io, v, indent=indent + 1)
+            else 
+                printstyled(io, string(k), color=:light_black)
+                println(io)
+            end
+        else
+            label = "$k: "
+            context = IOContext(io, 
+                :compact => true, 
+                :displaysize => (1, displaysize(io)[2] - length(label)), 
+                :limit => true
+            )
+            printstyled(io, label, color=labelcolor)
+            print(context, v)
+            println(io)
         end
-        out
-    end
-end
-function AbstractTrees.printnode(io::IO, o::Object) 
-    nm = getfield(o, :name)
-    if isempty(_d(o))
-        printstyled(io, "$nm (Nothing)", color=:light_black)
-    else
-        print(io, nm)
     end
 end
 
-struct NameAndValue 
-    name 
-    value 
+function Base.show(io::IO, ::MIME"text/html", o::Config)
+    print(io, "<code><ul>")
+    for (k,v) in pairs(dict(o))
+        print(io, "<li><strong>$k</strong>: ")
+        if showable(MIME"text/html"(), v)
+            show(IOContext(io, :compact=>true, :limit=>true), MIME"text/html"(), v)
+        else
+            print(io, v)
+        end
+        print(io, "</li>")
+    end
+    print(io, "</ul></code>")
 end
-function AbstractTrees.printnode(io::IO, o::NameAndValue) 
-    print(io, "$(o.name): ")
-    print(IOContext(io, :compact => true), o.value)
+
+#-----------------------------------------------------------------------------# json 
+function json(o::Config, indent=0; pretty=true)
+    io = IOBuffer()
+    println(io, '{')
+    for (i, (k,v)) in enumerate(dict(o))
+        print(io, "  " ^ indent)
+        println(io, "\"$k\": $(json(o, indent + 1; pretty))")
+    end
+    println(io, '}')
+    String(take!(io))
 end
-AbstractTrees.children(o::NameAndValue) = ()
 
+json(x, indent; pretty=true) = _json(x)
 
+_json(x) = x
+_json(x::AbstractArray) = collect(x)
+_json(x::Union{AbstractString, Char, Symbol}) = "\"$x\""
+_json(::Nothing) = "null"
+_json(::Missing) = "null"
 
 end # module
