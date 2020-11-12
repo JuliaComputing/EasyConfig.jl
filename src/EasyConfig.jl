@@ -1,6 +1,6 @@
 module EasyConfig
 
-using OrderedCollections
+using OrderedCollections, JSON
 
 export Config, indent!
 
