@@ -6,53 +6,41 @@
 [![Codecov](https://codecov.io/gh/joshday/EasyConfig.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/joshday/EasyConfig.jl)
 
 
-**EasyConfig** provides a nested `OrderedDict{Symbol, Any}` data structure with easy-to-use 
-`getproperty`/`setproperty!` syntax and pretty printing.
+**EasyConfig** provides an easy-to-use nested `AbstractDict{Symbol, Any}` data structure. 
 
-You can assign values 
-multiple levels deep before the levels above it exist.
+
+## Advantages over other dictionary types:
+
+The advantages are twofold.
+
+### 1) Intermediate levels are created on the fly:
 
 ```julia
-using EasyConfig
-
-conf = Config()
-
-conf.data.x = 1:100
-conf.data.y = rand(100)
-conf.data.type = "scatter"
-conf.layout.title = "My Title"
-conf.layout.xaxis.title = "X Axis"
-conf.layout.yaxis.title = "Y Axis"
-
-conf
+c = Config().one.two.three = 1
 ```
 
-You can then get a JSON string via
+vs.
 
+```julia
+c = OrderedDict(:one => OrderedDict(:two => OrderedDict(:three => 1)))
 ```
-EasyConfig.json(conf)
+
+### Values can be accessed via `getproperty`:
+
+```julia
+c.one.two.three == 1
 ```
 
-Objects are easily joinable:
+vs.
 
+```julia
+c[:one][:two][:three] == 1
 ```
-trace1 = config()
-trace1.x = 1:10
-trace1.y = rand(10)
-trace2.type = "scatter"
 
-trace2 = config()
-trace2.x = 1:10
-trace2.y = randn(10)
-trace2.type = "bar"
+## Conversion to JSON
 
-layout = config()
-layout.title = "My Title"
-layout.xaxis.title = "X"
-layout.yaxis.title = "Y"
+Available via `JSON3`
 
-output = config()
-output.data = [trace1, trace2]
-output.layout = layout
-output
+```julia
+JSON3.write(Config(x=1,y=2,z=[3,4]))
 ```
