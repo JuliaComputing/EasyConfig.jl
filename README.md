@@ -46,27 +46,31 @@ JSON3.write(Config(x=1,y=2,z=[3,4]))
 ## Example (Try this in Pluto!)
 
 ```julia
-using Random, EasyConfig
-
-function plotly_plot(config)
-    id = randstring(20)
-    HTML("""
-        <div id="$id""></div>
-        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-        <script>
-            var data = $(JSON3.write(config.data))
-            var layout = $(JSON3.write(config.layout))
-            Plotly.newPlot("$id", data, layout, {responsive:true, displaylogo: false, displayModeBar: false})
-        </script>
-    """)
+begin
+	using Random, EasyConfig, JSON3
+	
+	function plotly_plot(config)
+	    id = randstring(20)
+	    HTML("""
+	        <div id="$id""></div>
+	        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+	        <script>
+	            var data = $(JSON3.write(config.data))
+	            var layout = $(JSON3.write(config.layout))
+	            Plotly.newPlot("$id", data, layout, {responsive:true, displaylogo: false, displayModeBar: false})
+	        </script>
+	    """)
+	end
+	
+	myplot = Config()
+	
+	myplot.data = [Config(
+		x=randn(100), y = randn(100), name="Wow!", mode="markers"
+	)]
+	myplot.layout.title = "My Plot"
+	myplot.layout.xaxis.title = "X Axis"
+	myplot.layout.yaxis.title = "Y Axis"
+	
+	plotly_plot(myplot)
 end
-
-myplot = Config()
-
-myplot.data = [Config(x=randn(100), y = randn(100), name="Wow!")]
-myplot.layout.title = "My Plot"
-myplot.layout.xaxis.title = "X Axis"
-myplot.layout.yaxis.title = "Y Axis"
-
-plotly_plot(myplot.data, myplot)
 ```
