@@ -7,7 +7,7 @@
 **EasyConfig** provides an easy-to-use nested `AbstractDict{Symbol, Any}` data structure. 
 
 
-## Advantages over other dictionary types:
+## Advantages over other dictionaries/named tuples:
 
 The advantages are twofold.
 
@@ -21,12 +21,14 @@ vs.
 
 ```julia
 c = OrderedDict(:one => OrderedDict(:two => OrderedDict(:three => 1)))
+
+c = (one = (two = (three = 1,),),)
 ```
 
 ### 2) Values can be accessed via `getproperty`:
 
 ```julia
-c.one.two.three == 1
+c.one.two.three == 1  # Same as NamedTuple
 ```
 
 vs.
