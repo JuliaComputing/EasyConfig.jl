@@ -65,7 +65,7 @@ begin
 	myplot = Config()
 	
 	myplot.data = [Config(
-		x=randn(100), y = randn(100), name="Wow!", mode="markers"
+		x=randn(100), y = randn(100), mode="markers"
 	)]
 	myplot.layout.title = "My Plot"
 	myplot.layout.xaxis.title = "X Axis"
