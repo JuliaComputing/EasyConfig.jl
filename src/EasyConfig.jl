@@ -1,6 +1,6 @@
 module EasyConfig
 
-using OrderedCollections
+using OrderedCollections, StructTypes
 
 export Config, indent!
 
@@ -19,6 +19,7 @@ Config(;kw...) = Config(OrderedDict{Symbol, Any}(kw))
 
 dict(o::Config) = getfield(o, :d)
 
+StructTypes.StructType(::Type{Config}) = StructTypes.DictType()
 
 Base.getproperty(o::Config, k::Symbol) = get!(dict(o), k, Config())
 Base.setproperty!(o::Config, k::Symbol, v) = dict(o)[k] = v
