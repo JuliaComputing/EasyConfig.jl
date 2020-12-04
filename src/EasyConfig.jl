@@ -18,6 +18,9 @@ Base.getproperty(o::Config, k::Symbol) = get!(dict(o), k, Config())
 Base.setproperty!(o::Config, k::Symbol, v) = dict(o)[k] = v
 Base.propertynames(o::Config) = collect(keys(dict(o)))
 
+Base.getindex(o::Config, k) = getproperty(o, Symbol(k))
+Base.setindex!(o::Config, v, k) = setproperty!(o, Symbol(k), v)
+
 Base.iterate(o::Config, args...) = iterate(dict(o), args...)
 Base.keys(o::Config) = keys(dict(o))
 Base.values(o::Config) = values(dict(o))
