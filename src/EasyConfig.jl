@@ -28,6 +28,7 @@ Base.length(o::Config) = length(dict(o))
 Base.isempty(o::Config) = isempty(dict(o))
 Base.pairs(o::Config) = pairs(dict(o))
 Base.empty!(o::Config) = (empty!(dict(o)); o)
+Base.get(o::Config, k, default) = get(dict(o), k, default)
 
 Base.show(io::IO, o::Config) = show(io, MIME"text/plain"(), o)
 Base.show(io::IO, ::MIME"text/plain", o::Config) = JSON3.pretty(io, JSON3.write(o))
