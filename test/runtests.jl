@@ -11,4 +11,5 @@ c["level1"][:level2].b = [1,2]
 @test c.level1.level2.a == 1
 @test c.level1.level2.b == [1, 2]
 @test get(c, :not_there, 1) == 1
+@test get(c, "not_there", :hi) == :hi
 end
