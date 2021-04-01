@@ -23,22 +23,4 @@ end
 
     @test get!(c, "test2", 1) == 1
     @test c."test2" == 1
-
-    @test length(Config()) == 0 
-    @test length(c) == 1
 end
-
-
-
-
-# c = Config()
-# c.level1.thing = "level1.thing"
-# c.level1.level2.a = 1
-# c["level1"][:level2].b = [1,2]
-
-# @test c.level1.thing == "level1.thing"
-# @test c.level1.level2.a == 1
-# @test c.level1.level2.b == [1, 2]
-# @test get(c, :not_there, 1) == 1
-# @test get(c, "not_there", :hi) == :hi
-# @test 
