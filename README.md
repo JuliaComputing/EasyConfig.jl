@@ -7,15 +7,19 @@
 **EasyConfig** provides a simple nested `AbstractDict{Symbol, Any}` data structure. 
 
 
-## Advantages over other dictionaries/named tuples:
+## Advantages over dictionaries/named tuples:
 
 ### 1) Intermediate levels are created on the fly:
+
+😃
 
 ```julia
 c = Config().one.two.three = 1
 ```
 
 vs.
+
+😐
 
 ```julia
 c = OrderedDict(:one => OrderedDict(:two => OrderedDict(:three => 1)))
@@ -25,12 +29,10 @@ c = (one = (two = (three = 1,),),)
 c = (; one = (;two = (;three = 1)))
 ```
 
-### 2) Values can be accessed via `getproperty`/`getindex` with either `AbstractString` or `Symbol`s:
+### 2) Values can be accessed with `getproperty`:
 
 ```julia
-c.one.two.three == 1
-c."one"."two"."three" == 1
-c[:one][:two]["three"] == 1
+c.one.two.three == 1  # same as NamedTuple
 ```
 
 vs.
@@ -39,9 +41,11 @@ vs.
 c[:one][:two][:three] == 1
 ```
 
-### 3) Getting and setting can be done with `get/set` `property/index`:
+### 3) Getting/setting can be done with `get/set` `property/index`:
 
 (for the purpose of making `Symbol`s easier to work with)
+
+🙃
 
 ```julia
 c.why."would you"["need to do this?"] = "No reason"
@@ -55,7 +59,7 @@ Simply `JSON3.write` it! 🎉
 
 ## Gotchas
 
-If you try to access something that doesn't exist, an empty `Config()` will sit there (a consequence of allowing intermediate levels to be created on the fly):
+If you try to access something that doesn't exist, an empty `Config()` will sit there (a consequence of creating intermediate levels on the fly):
 
 ```julia
 c = Config()
@@ -63,9 +67,9 @@ c = Config()
 c.one.two.three.four.five.six == Config()
 ```
 
-Clean up any stranded empty `Config`s with `delete_empty!(::Config)`.
+🧹 Clean up any stranded empty `Config`s with `delete_empty!(::Config)`.
 
-## Example (Try this in [Pluto](https://github.com/fonsp/Pluto.jl)!)
+## Example (Try this in [Pluto](https://github.com/fonsp/Pluto.jl) 🎈!)
 
 ```julia
 begin
