@@ -4,12 +4,10 @@
 [![Codecov](https://codecov.io/gh/joshday/EasyConfig.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/joshday/EasyConfig.jl)
 
 
-**EasyConfig** provides an easy-to-use nested `AbstractDict{Symbol, Any}` data structure. 
+**EasyConfig** provides a simple nested `AbstractDict{Symbol, Any}` data structure. 
 
 
 ## Advantages over other dictionaries/named tuples:
-
-The advantages are twofold.
 
 ### 1) Intermediate levels are created on the fly:
 
@@ -23,12 +21,16 @@ vs.
 c = OrderedDict(:one => OrderedDict(:two => OrderedDict(:three => 1)))
 
 c = (one = (two = (three = 1,),),)
+
+c = (; one = (;two = (;three = 1)))
 ```
 
-### 2) Values can be accessed via `getproperty`:
+### 2) Values can be accessed via `getproperty`/`getindex` with either `AbstractString` or `Symbol`s:
 
 ```julia
-c.one.two.three == 1  # Same as NamedTuple
+c.one.two.three == 1
+c."one"."two"."three" == 1
+c[:one][:two]["three"] == 1
 ```
 
 vs.
@@ -37,21 +39,39 @@ vs.
 c[:one][:two][:three] == 1
 ```
 
-## Conversion to JSON
+### 3) Getting and setting can be done with `get/set` `property/index`:
 
-Available via `JSON3`
+(for the purpose of making `Symbol`s easier to work with)
 
 ```julia
-JSON3.write(Config(x=1,y=2,z=[3,4]))
+c.why."would you"["need to do this?"] = "No reason"
+
+c."why"[var"would you"]."need to do this?" == "No reason"
 ```
 
-## Example (Try this in Pluto!)
+## Conversion to JSON
+
+Simply `JSON3.write` it! 🎉
+
+## Gotchas
+
+If you try to access something that doesn't exist, an empty `Config()` will sit there (a consequence of allowing intermediate levels to be created on the fly):
+
+```julia
+c = Config()
+
+c.one.two.three.four.five.six == Config()
+```
+
+Clean up any stranded empty `Config`s with `delete_empty!(::Config)`.
+
+## Example (Try this in [Pluto](https://github.com/fonsp/Pluto.jl)!)
 
 ```julia
 begin
 	using Random, EasyConfig, JSON3
 	
-	function plotly_plot(config)
+	function plot(config)
 	    id = randstring(20)
 	    HTML("""
 	        <div id="$id""></div>
@@ -73,10 +93,6 @@ begin
 	myplot.layout.xaxis.title = "X Axis"
 	myplot.layout.yaxis.title = "Y Axis"
 	
-	plotly_plot(myplot)
+	plot(myplot)
 end
 ```
-
-### Screenshot
-
-![](https://user-images.githubusercontent.com/8075494/99103003-e6b29d00-25ac-11eb-9097-0b5fd5b42b6d.png)

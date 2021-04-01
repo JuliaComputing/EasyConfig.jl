@@ -4,7 +4,7 @@ using OrderedCollections
 using StructTypes
 using JSON3
 
-export Config
+export Config, delete_empty!
 
 #-----------------------------------------------------------------------------# Config
 """
@@ -28,9 +28,19 @@ mutable struct Config <: AbstractDict{Symbol, Any}
     d::OrderedDict{Symbol, Any}
 end
 Config(;kw...) = Config(OrderedDict{Symbol, Any}(kw))
+Config(pairs::Pair...) = Config(OrderedDict(pairs...))
+Config(d::AbstractDict) = _convert(d)
 
-Config(x) = x
-Config(x::AbstractDict) = Config(OrderedDict{Symbol,Any}(Symbol(k) => Config(v) for (k,v) in x))
+_convert(x) = x 
+_convert(x::AbstractDict) = Config(OrderedDict{Symbol,Any}(Symbol(k) => _convert(v) for (k,v) in x))
+
+
+delete_empty!(x) = x
+function delete_empty!(o::Config)
+    foreach(delete_empty!, values(o))
+    foreach(x -> isempty(x[2]) && delete!(o, x[1]), pairs(o))
+    o
+end
 
 dict(o::Config) = getfield(o, :d)
 
@@ -54,7 +64,11 @@ Base.length(o::Config) = length(dict(o))
 Base.isempty(o::Config) = isempty(dict(o))
 Base.pairs(o::Config) = pairs(dict(o))
 Base.empty!(o::Config) = (empty!(dict(o)); o)
-Base.get(o::Config, k, default) = get(dict(o), k, default)
-Base.get!(o::Config, k, default) = get!(dict(o), k, default)
+Base.get(o::Config, k, default) = get(dict(o), Symbol(k), default)
+Base.get!(o::Config, k, default) = get!(dict(o), Symbol(k), default)
+
+Base.delete!(o::Config, k) = delete!(dict(o), Symbol(k))
+
+Base.isequal(a::Config, b::Config) = dict(a) == dict(b)
 
 end # module
