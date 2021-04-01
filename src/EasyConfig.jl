@@ -70,5 +70,6 @@ Base.get!(o::Config, k, default) = get!(dict(o), Symbol(k), default)
 Base.delete!(o::Config, k) = delete!(dict(o), Symbol(k))
 
 Base.isequal(a::Config, b::Config) = dict(a) == dict(b)
+Base.copy(o::Config) = Config(copy(dict(o)))
 
 end # module
