@@ -30,7 +30,7 @@ end
 Config(;kw...) = Config(OrderedDict{Symbol, Any}(kw))
 Config(pairs::Pair...) = Config(OrderedDict(pairs...))
 Config(d::AbstractDict) = _convert(d)
-Config(x::NamedTuple) = Config(; x...)
+Config(x::NamedTuple) = Config(OrderedDict(k=>v for (k,v) in pairs(x)))
 
 _convert(x) = x 
 _convert(x::AbstractDict) = Config(OrderedDict{Symbol,Any}(Symbol(k) => _convert(v) for (k,v) in x))
