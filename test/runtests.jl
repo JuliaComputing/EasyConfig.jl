@@ -5,7 +5,7 @@ using Test
     @test Config() == Config()
     c = Config()
     c.x = 1
-    @test Config(x=1) == Config(:x => 1) == Config(Dict(:x => 1)) == c
+    @test Config(x=1) == Config(:x => 1) == Config(Dict(:x => 1)) == Config((; x=1)) == c
 end
 
 @testset "Set/get property/field" begin 
