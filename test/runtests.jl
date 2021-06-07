@@ -24,3 +24,15 @@ end
     @test get!(c, "test2", 1) == 1
     @test c."test2" == 1
 end
+
+@testset "from NamedTuple" begin 
+    nt = (x=1, y=(x=1, y=(x=1, y=(x=1,y=2))))
+    c = Config(nt)
+    c.y.y.y.y == 2
+end
+
+@testset "from Dict" begin 
+    d = Dict(:x => Dict(:x => Dict(:x => Dict(:x => 2))))
+    c = Config(d)
+    c.x.x.x.x == 2
+end
