@@ -32,7 +32,7 @@ Config(pairs::Pair...) = Config(OrderedDict(pairs...))
 Config(d::AbstractDict) = _convert(d)
 Config(x::NamedTuple) = Config(OrderedDict(k=>_convert(v) for (k,v) in pairs(x)))
 
-_convert(x) = x 
+_convert(x) = x
 _convert(x::Union{NamedTuple,AbstractDict}) = Config(OrderedDict{Symbol,Any}(Symbol(k) => _convert(v) for (k,v) in pairs(x)))
 
 
@@ -72,5 +72,21 @@ Base.delete!(o::Config, k) = delete!(dict(o), Symbol(k))
 
 Base.isequal(a::Config, b::Config) = dict(a) == dict(b)
 Base.copy(o::Config) = Config(copy(dict(o)))
+
+Base.merge(a, b) = merge!(copy(a), b)
+
+function Base.merge!(a::Config, b::Config)
+    for (k, v) in pairs(b)
+        if hasproperty(a, k)
+            if v isa Config
+                merge!(a[k], v)
+            else
+                a[k] = v
+            end
+        else
+            a[k] = v
+        end
+    end
+end
 
 end # module
