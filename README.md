@@ -4,22 +4,17 @@
 [![Codecov](https://codecov.io/gh/joshday/EasyConfig.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/joshday/EasyConfig.jl)
 
 
-**EasyConfig** provides a simple nested `AbstractDict{Symbol, Any}` data structure. 
+**EasyConfig** provides a simple nested `AbstractDict{Symbol, Any}` data structure.
 
+The main advantages over other `AbstractDict/NamedTuple`s are:
 
-## Advantages over dictionaries/named tuples:
-
-### 1) Intermediate levels are created on the fly:
-
-😃
+#### Intermediate levels are created on the fly.
 
 ```julia
 c = Config().one.two.three = 1
 ```
 
-vs.
-
-😐
+Compare this to `OrderedDict` and `NamedTuple`:
 
 ```julia
 c = OrderedDict(:one => OrderedDict(:two => OrderedDict(:three => 1)))
@@ -29,52 +24,30 @@ c = (one = (two = (three = 1,),),)
 c = (; one = (;two = (;three = 1)))
 ```
 
-### 2) Values can be accessed with `getproperty`:
+#### Getting/setting is achieved via `getindex`/`getproperty` and `setindex`/`setproperty`
 
 ```julia
-c.one.two.three == 1  # same as NamedTuple
+c.why."would you"["need to do this?"] = "Personal preferences"
+
+c."why"[var"would you"]."need to do this?" == "Personal preferences"
 ```
 
-vs.
+Compare this to `OrderedDict` and `NamedTuple`:
 
 ```julia
-c[:one][:two][:three] == 1
+OrderedDict(:why => OrderedDict(Symbol("would you") => OrderedDict(Symbol("need to do this?") => "Personal preferences")))
+
+(why = (var"would you" = (var"need to do this?" = "Personal preferences"),),)
+
+(; why = (; var"would you" = (; var"need to do this?" = "Personal preferences")))
 ```
-
-### 3) Getting/setting can be done with `get/set` `property/index`:
-
-(for the purpose of making `Symbol`s easier to work with)
-
-🙃
-
-```julia
-c.why."would you"["need to do this?"] = "No reason"
-
-c."why"[var"would you"]."need to do this?" == "No reason"
-```
-
-## Conversion to JSON
-
-Simply `JSON3.write` it! 🎉
-
-## Gotchas
-
-If you try to access something that doesn't exist, an empty `Config()` will sit there (a consequence of creating intermediate levels on the fly):
-
-```julia
-c = Config()
-
-c.one.two.three.four.five.six == Config()
-```
-
-🧹 Clean up any stranded empty `Config`s with `delete_empty!(::Config)`.
 
 ## Example (Try this in [Pluto](https://github.com/fonsp/Pluto.jl) 🎈!)
 
 ```julia
 begin
 	using Random, EasyConfig, JSON3
-	
+
 	function plot(config)
 	    id = randstring(20)
 	    HTML("""
@@ -87,16 +60,31 @@ begin
 	        </script>
 	    """)
 	end
-	
+
 	myplot = Config()
-	
+
 	myplot.data = [Config(
 		x=randn(100), y = randn(100), mode="markers"
 	)]
 	myplot.layout.title = "My Plot"
 	myplot.layout.xaxis.title = "X Axis"
 	myplot.layout.yaxis.title = "Y Axis"
-	
+
 	plot(myplot)
 end
 ```
+
+![](https://user-images.githubusercontent.com/8075494/99103003-e6b29d00-25ac-11eb-9097-0b5fd5b42b6d.png)
+
+
+## Gotchas
+
+If you try to access something that doesn't exist, an empty `Config()` will sit there (a consequence of creating intermediate levels on the fly):
+
+```julia
+c = Config()
+
+c.one.two.three.four.five.six == Config()
+```
+
+🧹 Clean up any stranded empty `Config`s with `delete_empty!(::Config)`.
