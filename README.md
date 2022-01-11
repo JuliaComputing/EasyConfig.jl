@@ -8,7 +8,7 @@
 
 The main advantages over other `AbstractDict/NamedTuple`s are:
 
-### Intermediate levels are created on the fly.
+### 1) Intermediate levels are created on the fly.
 
 ```julia
 c = Config().one.two.three = 1
@@ -24,7 +24,7 @@ c = (one = (two = (three = 1,),),)
 c = (; one = (;two = (;three = 1)))
 ```
 
-### Getting/setting is achieved via `getindex`/`getproperty` and `setindex`/`setproperty`
+### 2) Getting/setting is achieved via `getindex`/`getproperty` and `setindex`/`setproperty`
 
 ```julia
 c.why."would you"["need to do this?"] = "Personal preferences"
