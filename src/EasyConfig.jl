@@ -24,17 +24,21 @@ A wrapper around an `OrderedDict{Symbol, Any}` with the special properties:
     c = Config()
     c.one.two.three = "neat!"
 """
-mutable struct Config <: AbstractDict{Symbol, Any}
+struct Config <: AbstractDict{Symbol, Any}
     d::OrderedDict{Symbol, Any}
+    function Config(x::Union{NamedTuple, AbstractDict})
+        d = OrderedDict{Symbol,Any}()
+        for (k,v) in pairs(x)
+            d[Symbol(k)] = v isa Union{NamedTuple, AbstractDict} ? Config(v) : v
+        end
+        new(d)
+    end
+    Config() = new(OrderedDict{Symbol,Any}())
 end
-Config(;kw...) = Config(OrderedDict{Symbol, Any}(kw))
-Config(pairs::Pair...) = Config(OrderedDict(pairs...))
-Config(d::AbstractDict) = _convert(d)
-Config(x::NamedTuple) = Config(OrderedDict(k=>_convert(v) for (k,v) in pairs(x)))
+Config(; kw...) = Config(kw)
+Config(x...) = Config(OrderedDict(x...))
 
-_convert(x) = x
-_convert(x::Union{NamedTuple,AbstractDict}) = Config(OrderedDict{Symbol,Any}(Symbol(k) => _convert(v) for (k,v) in pairs(x)))
-
+OrderedCollections.isordered(::Type{Config}) = true
 
 delete_empty!(x) = x
 function delete_empty!(o::Config)
@@ -47,7 +51,7 @@ dict(o::Config) = getfield(o, :d)
 
 StructTypes.StructType(::Type{Config}) = StructTypes.DictType()
 
-Base.getproperty(o::Config, k::Symbol) = get!(o, Symbol(k), Config())
+Base.getproperty(o::Config, k::Symbol) = get!(o, k, Config())
 Base.getproperty(o::Config, k) = getproperty(o, Symbol(k))
 
 Base.setproperty!(o::Config, k::Symbol, v) = dict(o)[Symbol(k)] = v
