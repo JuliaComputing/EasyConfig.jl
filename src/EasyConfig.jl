@@ -41,8 +41,9 @@ OrderedCollections.isordered(::Type{Config}) = true
 
 delete_empty!(x) = x
 function delete_empty!(o::Config)
-    foreach(delete_empty!, values(o))
-    foreach(x -> isempty(x[2]) && delete!(o, x[1]), pairs(o))
+    for (k,v) in pairs(o)
+        v isa Config && isempty(v) ? delete!(o, k) : delete_empty!(v)
+    end
     o
 end
 
