@@ -91,6 +91,7 @@ function Base.merge!(a::Config, b::Config)
             a[k] = v
         end
     end
+    a
 end
 
 end # module
