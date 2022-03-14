@@ -1,12 +1,19 @@
-# EasyConfig
-
 [![Build status](https://github.com/joshday/EasyConfig.jl/workflows/CI/badge.svg)](https://github.com/joshday/EasyConfig.jl/actions?query=workflow%3ACI+branch%3Amaster)
 [![Codecov](https://codecov.io/gh/joshday/EasyConfig.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/joshday/EasyConfig.jl)
+[![deps](https://juliahub.com/docs/EasyConfig/deps.svg)](https://juliahub.com/ui/Packages/EasyConfig/tMFix?t=2)
+[![version](https://juliahub.com/docs/EasyConfig/version.svg)](https://juliahub.com/ui/Packages/EasyConfig/tMFix)
+[![pkgeval](https://juliahub.com/docs/EasyConfig/pkgeval.svg)](https://juliahub.com/ui/Packages/EasyConfig/tMFix)
 
 
-**EasyConfig** provides a simple nested `AbstractDict{Symbol, Any}` data structure.
+<h1 align="center">EasyConfig</h1>
+
+**EasyConfig** provides an easy-to-use nested `AbstractDict{Symbol, Any}` data structure.
+
+<br><br>
 
 The main advantages over other `AbstractDict/NamedTuple`s are:
+
+<br><br>
 
 ### 1) Intermediate levels are created on the fly.
 
@@ -23,6 +30,8 @@ c = (one = (two = (three = 1,),),)
 
 c = (; one = (;two = (;three = 1)))
 ```
+
+<br><br>
 
 ### 2) Getting/setting is achieved via `getindex`/`getproperty` and `setindex`/`setproperty`
 
@@ -42,40 +51,8 @@ OrderedDict(:why => OrderedDict(Symbol("would you") => OrderedDict(Symbol("need 
 (; why = (; var"would you" = (; var"need to do this?" = "Personal preferences")))
 ```
 
-## Example (Try this in [Pluto](https://github.com/fonsp/Pluto.jl) 🎈!)
 
-```julia
-begin
-	using Random, EasyConfig, JSON3
-
-	function plot(config)
-	    id = randstring(20)
-	    HTML("""
-	        <div id="$id""></div>
-	        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-	        <script>
-	            var data = $(JSON3.write(config.data))
-	            var layout = $(JSON3.write(config.layout))
-	            Plotly.newPlot("$id", data, layout, {responsive:true, displaylogo: false, displayModeBar: false})
-	        </script>
-	    """)
-	end
-
-	myplot = Config()
-
-	myplot.data = [Config(
-		x=randn(100), y = randn(100), mode="markers"
-	)]
-	myplot.layout.title = "My Plot"
-	myplot.layout.xaxis.title = "X Axis"
-	myplot.layout.yaxis.title = "Y Axis"
-
-	plot(myplot)
-end
-```
-
-![](https://user-images.githubusercontent.com/8075494/99103003-e6b29d00-25ac-11eb-9097-0b5fd5b42b6d.png)
-
+<br><br>
 
 ## Gotchas
 
