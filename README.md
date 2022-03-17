@@ -14,7 +14,8 @@
 ### 1) Intermediate levels are created on the fly.
 
 ```julia
-c = Config().one.two.three = 1
+c = Config()
+c.one.two.three = 1
 ```
 
 Compare this to `OrderedDict` and `NamedTuple`:
