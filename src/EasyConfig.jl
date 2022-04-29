@@ -94,4 +94,29 @@ function Base.merge!(a::Config, b::Config)
     a
 end
 
+#-----------------------------------------------------------------------------# @config
+"""
+    @config (x=1, y=2, z=(a=1,b=2))
+
+Use the NamedTuple syntax to construct a `Config`.
+"""
+macro config(ex)
+    quote
+        $(esc(EasyConfig._config(ex)))
+    end
+end
+
+function _config(ex)
+    if !hasproperty(ex, :head)
+        ex
+    elseif ex.head === :tuple
+        Expr(:call, :Config, _config.(ex.args)...)
+    elseif ex.head === :(=)
+        Expr(:kw, ex.args[1], _config(ex.args[2]))
+    else
+        ex
+    end
+end
+
+
 end # module
