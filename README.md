@@ -7,16 +7,23 @@
 
 <h1 align="center">EasyConfig</h1>
 
-**EasyConfig** provides an easy-to-use nested `AbstractDict{Symbol, Any}` data structure.  The main advantages over other `AbstractDict/NamedTuple`s are:
+**EasyConfig** provides an easy-to-use nested `AbstractDict{Symbol, Any}` data structure.
 
 <br><br>
 
-### 1) Intermediate levels are created on the fly.
+The advantages over other `AbstractDict/NamedTuple`s are:
+
+# 1) Intermediate levels are created on the fly:
 
 ```julia
 c = Config()
 c.one.two.three = 1
 ```
+
+- This is *super* convenient for working with JSON specs (e.g. [PlotlyLight.jl](https://github.com/JuliaComputing/PlotlyLight.jl)).
+- As you'd expect, you can `JSON3.write(c)` into a JSON string.
+
+<br>
 
 Compare this to `OrderedDict` and `NamedTuple`:
 
@@ -30,35 +37,48 @@ c = (; one = (;two = (;three = 1)))
 
 <br><br>
 
-### 2) Getting/setting is achieved via `getindex`/`getproperty` and `setindex`/`setproperty`
+### 2) Any combination of `Symbol`/`AbstractString` with (`getproperty`/`getindex`) works.
+
+- For working with `Config`s *interactively*, `getproperty` is the most convenient to work with.
+- For working with `Config`s *programmatically*, `getindex` is the most convenient to work with.
+- This gives you the best of both worlds.
 
 ```julia
-c.why."would you"["need to do this?"] = "Personal preferences"
+# getproperty
+c.one.two.three
+c."one"."two"."three"
 
-c."why"[var"would you"]."need to do this?" == "Personal preferences"
+# getindex
+c[:one][:two][:three]
+c["one"]["two"]["three"]
+
+# mix and match
+c["one"].two."three"
 ```
 
-Compare this to `OrderedDict` and `NamedTuple`:
+- You can similarly use `setproperty!`/`setindex!` in the same way:
 
 ```julia
-OrderedDict(:why => OrderedDict(Symbol("would you") => OrderedDict(Symbol("need to do this?") => "Personal preferences")))
+c["one"].two."three" = 5
 
-(why = (var"would you" = (var"need to do this?" = "Personal preferences"),),)
-
-(; why = (; var"would you" = (; var"need to do this?" = "Personal preferences")))
+c.one.two.three == 5  # true
 ```
-
 
 <br><br>
 
-## Gotchas
 
-If you try to access something that doesn't exist, an empty `Config()` will sit there (a consequence of creating intermediate levels on the fly):
+## Note
+
+- If you try to access something that doesn't exist, an empty `Config()` will sit there.
+- This is a consequence of creating intermediate levels on the fly.
+- Clean up stranded empty `Config`s with `delete_empty!(::Config)`.
 
 ```julia
 c = Config()
 
 c.one.two.three.four.five.six == Config()
-```
 
-🧹 Clean up any stranded empty `Config`s with `delete_empty!(::Config)`.
+# Internally we make the assumption that empty Config's shouldn't be there.
+# Some functions will therefore call `delete_empty!` under the hood:
+isempty(c) == true
+```
