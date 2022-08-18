@@ -7,11 +7,8 @@
 
 <h1 align="center">EasyConfig</h1>
 
-**EasyConfig** provides an easy-to-use nested `AbstractDict{Symbol, Any}` data structure.
-
-<br><br>
-
-The advantages over other `AbstractDict/NamedTuple`s are:
+- **EasyConfig** provides an easy-to-use nested `AbstractDict{Symbol, Any}` data structure.
+- The advantages over other `AbstractDict/NamedTuple`s are:
 
 # 1) Intermediate levels are created on the fly:
 
