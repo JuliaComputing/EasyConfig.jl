@@ -33,6 +33,7 @@ struct Config <: AbstractDict{Symbol, Any}
         end
         new(d)
     end
+    Config(x::Config) = x
 end
 Config(; kw...) = Config(kw)
 Config(x...) = Config(OrderedDict(x...))
