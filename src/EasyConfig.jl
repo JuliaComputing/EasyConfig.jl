@@ -4,7 +4,7 @@ using OrderedCollections
 using StructTypes
 using JSON3
 
-export Config, delete_empty!
+export Config, delete_empty!, @config
 
 #-----------------------------------------------------------------------------# Config
 """
@@ -97,27 +97,23 @@ end
 
 #-----------------------------------------------------------------------------# @config
 """
-    @config (x=1, y=2, z=(a=1,b=2))
+    @config (x=1, y=2, z.a=1, z.b=2)
 
-Use the NamedTuple syntax to construct a `Config`.
+Use NamedTuple-like syntax to construct a `Config`.
 """
 macro config(ex)
-    quote
-        $(esc(EasyConfig._config(ex)))
+    ex.head == :tuple || error("@config input must be a tuple")
+    all(x -> x.head == :(=), ex.args) || error("Unexpected syntax in @config")
+    x = gensym()
+    out = Expr(:block, :(local $x = Config()))
+    for val in ex.args
+        lhs, rhs = val.args
+        push!(out.args, :($(_prepend(x, lhs)) = $rhs))
     end
+    push!(out.args, x)
+    esc(out)
 end
 
-function _config(ex)
-    if !hasproperty(ex, :head)
-        ex
-    elseif ex.head === :tuple
-        Expr(:call, :Config, _config.(ex.args)...)
-    elseif ex.head === :(=)
-        Expr(:kw, ex.args[1], _config(ex.args[2]))
-    else
-        ex
-    end
-end
-
-
+_prepend(val, e::Symbol) = :($val.$e)
+_prepend(val, e) = e.head == :. && (e.args[1] = _prepend(val, e.args[1]); e)
 end # module
