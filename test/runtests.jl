@@ -70,3 +70,12 @@ end
     @test StructTypes.keyvaluepairs(c)[:x] == 1
     @test StructTypes.keyvaluepairs(c)[:y] == 2
 end
+
+@testset "@config" begin
+    val = 5
+    c = @config (x.a=1, x.b=2, x.c.d.e.f.g = 3, z = val)
+    @test c.x.a == 1
+    @test c.x.b == 2
+    @test c.x.c.d.e.f.g == 3
+    @test c.z == val
+end

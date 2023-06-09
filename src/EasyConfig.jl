@@ -82,15 +82,7 @@ Base.merge(a, b) = merge!(copy(a), b)
 
 function Base.merge!(a::Config, b::Config)
     for (k, v) in pairs(b)
-        if hasproperty(a, k)
-            if v isa Config
-                merge!(a[k], v)
-            else
-                a[k] = v
-            end
-        else
-            a[k] = v
-        end
+        hasproperty(a, k) && v isa Config ? merge!(a[k], v) : setindex!(a, v, k)
     end
     a
 end
