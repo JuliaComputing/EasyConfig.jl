@@ -15,6 +15,9 @@
 ```julia
 c = Config()
 c.one.two.three = 1
+
+# or use NamedTuple-like syntax with @config
+@config (one.two.three = 1,)
 ```
 
 - This is *super* convenient for working with JSON specs (e.g. [PlotlyLight.jl](https://github.com/JuliaComputing/PlotlyLight.jl)).
