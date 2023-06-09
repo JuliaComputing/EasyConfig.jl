@@ -7,10 +7,13 @@
 
 <h1 align="center">EasyConfig</h1>
 
-- **EasyConfig** provides an easy-to-use nested `AbstractDict{Symbol, Any}` data structure.
+- **EasyConfig** provides a friendly-syntax, nested `AbstractDict{Symbol, Any}` data structure.
 - The advantages over other `AbstractDict/NamedTuple`s are:
 
 # 1) Intermediate levels are created on the fly:
+
+- This is quite convenient for working with JSON specs (e.g. [PlotlyLight.jl](https://github.com/JuliaComputing/PlotlyLight.jl)).
+
 
 ```julia
 c = Config()
@@ -20,12 +23,9 @@ c.one.two.three = 1
 @config (one.two.three = 1,)
 ```
 
-- This is *super* convenient for working with JSON specs (e.g. [PlotlyLight.jl](https://github.com/JuliaComputing/PlotlyLight.jl)).
-- As you'd expect, you can `JSON3.write(c)` into a JSON string.
-
 <br>
 
-Compare this to `OrderedDict` and `NamedTuple`:
+- Compare this to `OrderedDict` and `NamedTuple`:
 
 ```julia
 c = OrderedDict(:one => OrderedDict(:two => OrderedDict(:three => 1)))
@@ -37,31 +37,21 @@ c = (; one = (;two = (;three = 1)))
 
 <br><br>
 
-### 2) Any combination of `Symbol`/`AbstractString` with (`getproperty`/`getindex`) works.
+# 2) Friendly Syntax
 
-- For working with `Config`s *interactively*, `getproperty` is the most convenient to work with.
-- For working with `Config`s *programmatically*, `getindex` is the most convenient to work with.
-- This gives you the best of both worlds.
+- You can use any combination of `String`/`Symbol` with `getproperty`/`getindex`.
+- For working *interactively*, `getproperty` is the most convenient to work with.
+- For working *programmatically*, `getindex` is the most convenient to work with.
 
 ```julia
 # getproperty
 c.one.two.three
-c."one"."two"."three"
 
 # getindex
 c[:one][:two][:three]
-c["one"]["two"]["three"]
 
 # mix and match
 c["one"].two."three"
-```
-
-- You can similarly use `setproperty!`/`setindex!` in the same way:
-
-```julia
-c["one"].two."three" = 5
-
-c.one.two.three == 5  # true
 ```
 
 <br><br>
@@ -69,8 +59,7 @@ c.one.two.three == 5  # true
 
 ## Note
 
-- If you try to access something that doesn't exist, an empty `Config()` will sit there.
-- This is a consequence of creating intermediate levels on the fly.
+- Accessing a property that doesn't exist will create an empty `Config()`.
 - Clean up stranded empty `Config`s with `delete_empty!(::Config)`.
 
 ```julia
