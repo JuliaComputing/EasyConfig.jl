@@ -16,7 +16,7 @@
 c = Config()
 c.one.two.three = 1
 
-# or use NamedTuple-like syntax with @config
+# or use Tuple-like syntax with @config
 @config (one.two.three = 1,)
 ```
 
