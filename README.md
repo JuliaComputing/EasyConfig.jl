@@ -34,7 +34,7 @@ c = (; one = (;two = (;three = 1)))
 
 <br><br>
 
-## 2) Friendly Syntax
+## 2) Easy to Use Both Interactively and Programmatically
 
 - You can use any combination of `String`/`Symbol` with `getproperty`/`getindex`.
 - For working *interactively*, `getproperty` is the most convenient to work with.
