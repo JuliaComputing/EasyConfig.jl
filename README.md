@@ -10,7 +10,7 @@
 - **EasyConfig** provides a friendly-syntax, nested `AbstractDict{Symbol, Any}` data structure.
 - The advantages over other `AbstractDict/NamedTuple`s are:
 
-# 1) Intermediate levels are created on the fly:
+## 1) Intermediate levels are created on the fly:
 
 - This is quite convenient for working with JSON specs (e.g. [PlotlyLight.jl](https://github.com/JuliaComputing/PlotlyLight.jl)).
 
@@ -18,9 +18,6 @@
 ```julia
 c = Config()
 c.one.two.three = 1
-
-# or use Tuple-like syntax with @config
-@config (one.two.three = 1,)
 ```
 
 <br>
@@ -37,7 +34,7 @@ c = (; one = (;two = (;three = 1)))
 
 <br><br>
 
-# 2) Friendly Syntax
+## 2) Friendly Syntax
 
 - You can use any combination of `String`/`Symbol` with `getproperty`/`getindex`.
 - For working *interactively*, `getproperty` is the most convenient to work with.
@@ -56,8 +53,31 @@ c["one"].two."three"
 
 <br><br>
 
+# `@config`
 
-## Note
+Create a `Config` with a NamedTuple-like or block syntax. The following examples create equivalent `Config`s:
+
+```julia
+@config (x.one=1, x.two=2, z=3)
+
+@config x.one=1 x.two=2 z=3
+
+@config begin
+    x.one = 1
+    x.two = 2
+    z = 3
+end
+
+let
+    c = Config()
+    c.x.one = 1
+    c.x.two = 2
+    c.z = 3
+end
+```
+
+
+# Note
 
 - Accessing a property that doesn't exist will create an empty `Config()`.
 - Clean up stranded empty `Config`s with `delete_empty!(::Config)`.
