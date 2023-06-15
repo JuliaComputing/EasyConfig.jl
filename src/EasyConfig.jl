@@ -93,7 +93,13 @@ end
 
 Use NamedTuple-like syntax to construct a `Config`.
 """
-macro config(ex)
+macro config(ex...)
+    exprs = collect(ex)
+    if length(exprs) == 1
+        ex = only(exprs)
+    else
+        ex = Expr(:tuple, exprs...)
+    end
     ex.head == :tuple || error("@config input must be a tuple")
     all(x -> x.head == :(=), ex.args) || error("Unexpected syntax in @config")
     x = gensym()
