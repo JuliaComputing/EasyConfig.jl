@@ -78,4 +78,21 @@ end
     @test c.x.b == 2
     @test c.x.c.d.e.f.g == 3
     @test c.z == val
+
+    c2 = @config x.a=1 x.b=2 x.c.d.e.f.g=3 z=val
+
+    c3 = @config begin
+        x.a = 1
+        x.b = 2
+        x.c.d.e.f.g = 3
+        z = val
+    end
+
+    c4 = Config()
+    c4.x.a = 1
+    c4.x.b = 2
+    c4.x.c.d.e.f.g = 3
+    c4.z = val
+
+    @test c == c2 == c3
 end

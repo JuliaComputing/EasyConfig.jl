@@ -89,14 +89,34 @@ end
 
 #-----------------------------------------------------------------------------# @config
 """
-    @config (x=1, y=2, z.a=1, z.b=2)
+    @config expr
 
-Use NamedTuple-like syntax to construct a `Config`.
+Create a `Config` with a NamedTuple-like or block syntax.  The following examples create equivalent `Config`s:
+
+    @config (x.one=1, x.two=2, z=3)
+
+    @config x.one=1 x.two=2 z=3
+
+    @config begin
+        x.one = 1
+        x.two = 2
+        z = 3
+    end
+
+    let
+        c = Config()
+        c.x.one = 1
+        c.x.two = 2
+        c.z = 3
+    end
 """
 macro config(ex...)
     exprs = collect(ex)
     if length(exprs) == 1
         ex = only(exprs)
+        if ex.head == :block
+            ex = Expr(:tuple, filter(x -> !(x isa LineNumberNode), ex.args)...)
+        end
     else
         ex = Expr(:tuple, exprs...)
     end
