@@ -1,5 +1,5 @@
-[![Build status](https://github.com/joshday/EasyConfig.jl/workflows/CI/badge.svg)](https://github.com/joshday/EasyConfig.jl/actions?query=workflow%3ACI+branch%3Amaster)
-[![Codecov](https://codecov.io/gh/joshday/EasyConfig.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/joshday/EasyConfig.jl)
+[![Build status](https://github.com/JuliaComputing/EasyConfig.jl/workflows/CI/badge.svg)](https://github.com/JuliaComputing/EasyConfig.jl/actions?query=workflow%3ACI+branch%3Amaster)
+[![Codecov](https://codecov.io/gh/JuliaComputing/EasyConfig.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaComputing/EasyConfig.jl)
 [![deps](https://juliahub.com/docs/EasyConfig/deps.svg)](https://juliahub.com/ui/Packages/EasyConfig/tMFix?t=2)
 [![version](https://juliahub.com/docs/EasyConfig/version.svg)](https://juliahub.com/ui/Packages/EasyConfig/tMFix)
 [![pkgeval](https://juliahub.com/docs/EasyConfig/pkgeval.svg)](https://juliahub.com/ui/Packages/EasyConfig/tMFix)
