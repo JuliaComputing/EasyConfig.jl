@@ -1,6 +1,6 @@
 using EasyConfig
 using StructTypes
-using OrderedCollections: OrderedDict
+using OrderedCollections: OrderedCollections, OrderedDict
 using Test
 
 @testset "Constructors" begin
@@ -33,6 +33,19 @@ end
     @test all(values(Config(x = 1)) .== values(OrderedDict(:x => 1)))
     @test pairs(Config(x = 1)) == pairs(OrderedDict(:x => 1))
     @test empty!(Config(x=1)) == Config()
+    @test haskey(Config(x=1), "x") == haskey(Config(x=1), :x) == true
+
+    @test OrderedCollections.isordered(Config)
+
+    @test Config(x=1) == Config(:x => 1) == Config("x" => 1)
+
+    a = Config(x=1)
+    b = copy(a)
+    @test a !== b
+
+    c = merge(a, Config(x=2,y=3))
+    @test c.x == 2
+    @test c.y == 3
 end
 
 @testset "from NamedTuple" begin
@@ -61,7 +74,10 @@ end
 @testset "isempty/delete_empty!" begin
     c = Config()
     c.x.x.x
-    @test isempty(c) == true
+    @test isempty(c)
+    c.x.x.x
+    EasyConfig.delete_empty!(c)
+    @test isempty(c)
 end
 
 @testset "StructTypes" begin
