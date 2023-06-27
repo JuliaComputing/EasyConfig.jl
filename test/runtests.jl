@@ -8,6 +8,18 @@ using Test
     c = Config()
     c.x = 1
     @test Config(x=1) == Config(:x => 1) == Config(Dict(:x => 1)) == Config((; x=1)) == c
+
+    @testset "AbstractDict values" begin
+        d = Dict(:x => Dict(:y => 1))
+        c = Config(d)
+        @test c.x isa Config
+    end
+
+    @testset "Vector{<:AbstractDict} values" begin
+        d = Dict(:x => [Dict(:y => 1), Dict(:y=> 2)])
+        c = Config(d)
+        @test c.x isa Vector{Config}
+    end
 end
 
 @testset "Set/get property/field" begin

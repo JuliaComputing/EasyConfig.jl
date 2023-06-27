@@ -29,7 +29,8 @@ struct Config <: AbstractDict{Symbol, Any}
     function Config(x::Union{NamedTuple, AbstractDict})
         d = OrderedDict{Symbol,Any}()
         for (k,v) in pairs(x)
-            d[Symbol(k)] = v isa Union{NamedTuple, AbstractDict} ? Config(v) : v
+            d[Symbol(k)] = v isa Union{NamedTuple, AbstractDict} ? Config(v) :
+                v isa (Vector{T} where {T<:AbstractDict}) ? Config.(v) : v
         end
         new(d)
     end
