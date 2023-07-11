@@ -29,8 +29,7 @@ struct Config <: AbstractDict{Symbol, Any}
     function Config(x::Union{NamedTuple, AbstractDict})
         d = OrderedDict{Symbol,Any}()
         for (k,v) in pairs(x)
-            d[Symbol(k)] = v isa Union{NamedTuple, AbstractDict} ? Config(v) :
-                v isa (Vector{T} where {T<:AbstractDict}) ? Config.(v) : v
+            d[Symbol(k)] = _config_value(v)
         end
         new(d)
     end
@@ -38,6 +37,11 @@ struct Config <: AbstractDict{Symbol, Any}
 end
 Config(; kw...) = Config(kw)
 Config(x...) = Config(OrderedDict(x...))
+
+_config_value(x) = x
+_config_value(x::AbstractDict) = Config(x)
+_config_value(x::Pair) = Config(Symbol(x[1]) => x[2])
+_config_value(x::AbstractArray) = map(_config_value, x)
 
 OrderedCollections.isordered(::Type{Config}) = true
 

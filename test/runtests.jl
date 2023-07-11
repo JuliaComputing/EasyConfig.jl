@@ -20,6 +20,13 @@ using Test
         c = Config(d)
         @test c.x isa Vector{Config}
     end
+
+    @testset "Pair values" begin
+        data = [Dict("x"=>1), "y" => 2]
+        c = Config(; data)
+        @test c.data[1].x == 1
+        @test c.data[2].y == 2
+    end
 end
 
 @testset "Set/get property/field" begin
