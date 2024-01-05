@@ -79,7 +79,7 @@ Base.get(o::Config, k, default) = get(dict(o), Symbol(k), default)
 Base.get!(o::Config, k, default) = get!(dict(o), Symbol(k), default)
 Base.haskey(o::Config, k) = haskey(dict(o), Symbol(k))
 
-Base.delete!(o::Config, k) = delete!(dict(o), Symbol(k))
+Base.delete!(o::Config, k) = (delete!(dict(o), Symbol(k)); o)
 
 Base.isequal(a::Config, b::Config) = dict(a) == dict(b)
 Base.copy(o::Config) = Config(copy(dict(o)))
