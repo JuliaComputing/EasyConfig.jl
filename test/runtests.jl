@@ -65,6 +65,15 @@ end
     c = merge(a, Config(x=2,y=3))
     @test c.x == 2
     @test c.y == 3
+
+    # https://github.com/JuliaComputing/EasyConfig.jl/issues/8
+    a = Config(x=1)
+    b = Config(y=Config(z=2))
+    c = merge(a, b)
+    @test a == Config(x=1)
+
+    merge!(a, b)
+    @test a == Config(x=1, y=Config(z=2))
 end
 
 @testset "from NamedTuple" begin

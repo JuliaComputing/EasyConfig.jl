@@ -84,14 +84,9 @@ Base.delete!(o::Config, k) = (delete!(dict(o), Symbol(k)); o)
 Base.isequal(a::Config, b::Config) = dict(a) == dict(b)
 Base.copy(o::Config) = Config(copy(dict(o)))
 
-Base.merge(a::Config, b::Config) = merge!(copy(a), b)
+Base.merge(a::Config, b::Config) = Config(merge(dict(a), dict(b)))
 
-function Base.merge!(a::Config, b::Config)
-    for (k, v) in pairs(b)
-        hasproperty(a, k) && v isa Config ? merge!(a[k], v) : setindex!(a, v, k)
-    end
-    a
-end
+Base.merge!(a::Config, b::Config) = Config(merge!(dict(a), dict(b)))
 
 #-----------------------------------------------------------------------------# @config
 """
